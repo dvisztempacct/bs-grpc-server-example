@@ -1,0 +1,30 @@
+syntax = "proto3";
+package chat;
+
+
+import "google/protobuf/descriptor.proto";
+extend google.protobuf.FileOptions {
+  string tin_module_validation = 4000;
+}
+extend google.protobuf.MessageOptions {
+  string tin_message_validation = 4000;
+}
+extend google.protobuf.FieldOptions {
+  string tin_field_validation = 4000;
+}
+
+message Message {
+  string message = 1 [
+    (tin_field_validation) = "hdon field option value"
+  ];
+}
+message MessageAck {
+  option (tin_message_validation) = "hdon message option value";
+  oneof result {
+    string message = 1;
+    string error = 2;
+  }
+}
+service ChatService {
+  rpc SendMessage (Message) returns (MessageAck) {}
+}
