@@ -13,18 +13,56 @@ extend google.protobuf.FieldOptions {
   string tin_field_validation = 4000;
 }
 
-message Message {
-  string message = 1 [
-    (tin_field_validation) = "hdon field option value"
+message IdentRequest {
+  string nick = 1 [
+    (tin_field_validation) = "required |. trimString |. nonEmptyString |. maxStrLen(8)"
   ];
 }
-message MessageAck {
-  option (tin_message_validation) = "hdon message option value";
+
+message IdentReply {
+  string error = 1;
+}
+
+message SendMessageRequest {
+  string channel = 1 [
+    (tin_field_validation) = "required |. trimString |. minStrLen(3) |. maxStrLen(16)"
+  ];
+  string text = 2 [
+    (tin_field_validation) = "required |. trimString |. nonEmptyString |. maxStrLen(70)"
+  ];
+}
+
+message SendMessageReply {
+  string error = 1;
+}
+
+message PollRequest {
+  repeated string channels = 1 [
+    (tin_field_validation) = "minItemCount(1) |. maxItemCount(16) |. items(x => x |. minStrLen(3) |. maxStrLen(16))"
+  ];
+  fixed32 time = 2 [
+    (tin_field_validation) = "required |. positive"
+  ];
+}
+
+message ChannelMessage {
+  string channel = 1;
+  string nick = 2;
+  string text = 3;
+};
+
+message ChannelMessages {
+  repeated ChannelMessage channel_messages = 1;
+};
+
+message PollReply {
   oneof result {
-    string message = 1;
+    ChannelMessages channel_messages = 1;
     string error = 2;
   }
 }
+
 service ChatService {
-  rpc SendMessage (Message) returns (MessageAck) {}
+  rpc SendMessage (SendMessageRequest) returns (SendMessageReply) {}
+  rpc Poll (PollRequest) returns (PollReply) {}
 }
