@@ -97,7 +97,6 @@ let poll = (call, callback) => {
 
 let credentials = Grpc.Server.Credentials.Insecure.make();
 
-/* need poll handler but for some reason it's called error? */
 let chatService = Grpc.Chat.ChatService.t(~sendMessage, ~poll);
 
 let server = Grpc.Server.make("127.0.0.1:12345", ~credentials, ~chatService);
