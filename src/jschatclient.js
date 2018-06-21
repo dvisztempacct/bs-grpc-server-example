@@ -4,28 +4,51 @@ const chatServiceClient = new chat.ChatService('127.0.0.1:12345', grpc.credentia
 const now = () => Math.floor(Date.now() / 1000)
 
 process.stdin.on('data', chunk => {
-  chatServiceClient.sendMessage({
+  const text = chunk.toString('utf8').trim()
+  const msg = {
     channel: '#random',
     text: chunk.toString('utf8').trim()
-  }, (err, res) => {
+  }
+  switch (text) {
+    case '/nochan':
+      delete msg.channel
+      break
+    case '/notext':
+      delete msg.text
+      break
+    case '/nothing':
+      delete msg.channel
+      delete msg.text
+      break
+  }
+  chatServiceClient.sendMessage(msg, (err, res) => {
     if (err) console.error('err', err)
   })
 })
 let lastPollTime = now()
 const interval = setInterval(() => {
-  chatServiceClient.poll({
+  const pollRequest = {
     channels: ['#random'],
     time: lastPollTime
-  }, (err, res) => {
+  }
+  console.log("polling", pollRequest)
+  chatServiceClient.poll(pollRequest, (err, res) => {
+    console.log("polled", err, res)
     if (err) console.error('err', err)
     else {
-      res.channel_messages.channel_messages.forEach(channel_message => {
-        console.log(
-          channel_message.channel,
-          channel_message.nick,
-          channel_message.text
-        )
-      })
+      if (res.result == 'error') {
+        console.error('app err:', res.error)
+      } else {
+        if (res.channel_messages.channel_messages != null) {
+          res.channel_messages.channel_messages.forEach(channel_message => {
+            console.log(
+              channel_message.channel,
+              channel_message.nick,
+              channel_message.text
+            )
+          })
+        }
+      }
     }
   })
   lastPollTime = now()

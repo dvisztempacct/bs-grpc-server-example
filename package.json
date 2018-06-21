@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "bs-grpc": "^0.1.5",
-    "grpc": "^1.13.0-pre1"
+    "bs-result": "^2.2.0",
+    "grpc": "^1.13.0-pre1",
+    "reason-future": "^2.2.1"
   }
 }

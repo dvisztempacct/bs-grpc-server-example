@@ -15,7 +15,7 @@ extend google.protobuf.FieldOptions {
 
 message IdentRequest {
   string nick = 1 [
-    (tin_field_validation) = "required |. trimString |. nonEmptyString |. maxStrLen(8)"
+    (tin_field_validation) = "required |> trimString |> nonEmptyString |> maxStrLen(8)"
   ];
 }
 
@@ -25,10 +25,10 @@ message IdentReply {
 
 message SendMessageRequest {
   string channel = 1 [
-    (tin_field_validation) = "required |. trimString |. minStrLen(3) |. maxStrLen(16)"
+    (tin_field_validation) = "required |> trimString |> minStrLen(3) |> maxStrLen(16)"
   ];
   string text = 2 [
-    (tin_field_validation) = "required |. trimString |. nonEmptyString |. maxStrLen(70)"
+    (tin_field_validation) = "required |> trimString |> nonEmptyString |> maxStrLen(70)"
   ];
 }
 
@@ -38,10 +38,10 @@ message SendMessageReply {
 
 message PollRequest {
   repeated string channels = 1 [
-    (tin_field_validation) = "minItemCount(1) |. maxItemCount(16) |. items(x => x |. minStrLen(3) |. maxStrLen(16))"
+    (tin_field_validation) = "minItemCount(1) |> maxItemCount(16) /*|> items(x => x |> minStrLen(3) |> maxStrLen(16))*/"
   ];
   fixed32 time = 2 [
-    (tin_field_validation) = "required |. positive"
+    (tin_field_validation) = "required |> positive"
   ];
 }
 

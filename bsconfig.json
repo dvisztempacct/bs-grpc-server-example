@@ -11,7 +11,8 @@
   },
   "suffix": ".bs.js",
   "bs-dependencies": [
-      // add your bs-dependencies here 
+    "reason-future",
+    "bs-result"
   ],
   "warnings": {
     "error" : "+101"
