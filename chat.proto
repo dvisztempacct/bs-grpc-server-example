@@ -30,6 +30,7 @@ message SendMessageRequest {
   string text = 2 [
     (tin_field_validation) = "required |> trimString |> nonEmptyString |> maxStrLen(70)"
   ];
+  option (tin_message_validation) = "x|.channel|.Belt.Option.getExn != \"#nope\" ? okSome(x) : transFieldError(\"can't send to channel #nope\")";
 }
 
 message SendMessageReply {
@@ -60,6 +61,16 @@ message PollReply {
     ChannelMessages channel_messages = 1;
     string error = 2;
   }
+}
+
+message PasswordResetRequest {
+  string password = 1 [
+    (tin_field_validation) = "required |> minStrLen(10)"
+  ];
+  string passwordConfirm = 2 [
+    (tin_field_validation) = "required |> minStrLen(10)"
+  ];
+  option (tin_message_validation) = "password(x) == passwordConfirm(x) ? okSome(x) : transFieldError(\"passwords don't match\")";
 }
 
 service ChatService {

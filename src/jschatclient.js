@@ -20,20 +20,27 @@ process.stdin.on('data', chunk => {
       delete msg.channel
       delete msg.text
       break
+    case '/passfail':
+      return void passFail()
+    case '/nopechan':
+      msg.channel = '#nope'
+      break
   }
   chatServiceClient.sendMessage(msg, (err, res) => {
+    console.log("sendMessage sez", err, res)
     if (err) console.error('err', err)
   })
 })
+function passFail() {
+  chatServiceClient.passwordReset
+}
 let lastPollTime = now()
 const interval = setInterval(() => {
   const pollRequest = {
     channels: ['#random'],
     time: lastPollTime
   }
-  console.log("polling", pollRequest)
   chatServiceClient.poll(pollRequest, (err, res) => {
-    console.log("polled", err, res)
     if (err) console.error('err', err)
     else {
       if (res.result == 'error') {
