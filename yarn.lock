@@ -61,8 +61,8 @@
   resolved "https://registry.yarnpkg.com/@protobufjs/utf8/-/utf8-1.1.0.tgz#a777360b5b39a1a2e5106f8e858f2fd2d060c570"
 
 "@types/lodash@^4.14.104":
-  version "4.14.109"
-  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.109.tgz#b1c4442239730bf35cabaf493c772b18c045886d"
+  version "4.14.110"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.110.tgz#fb07498f84152947f30ea09d89207ca07123461e"
 
 "@types/long@^3.0.32":
   version "3.0.32"
@@ -73,8 +73,8 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-8.10.20.tgz#fe674ea52e13950ab10954433a7824438aabbcac"
 
 "@types/node@^9.4.6":
-  version "9.6.21"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.21.tgz#4563c26a53531c5aca943065fcdf2dd562f63cd4"
+  version "9.6.22"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-9.6.22.tgz#05b55093faaadedea7a4b3f76e9a61346a6dd209"
 
 abbrev@1:
   version "1.1.1"
@@ -166,9 +166,9 @@ brace-expansion@^1.1.7:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
-bs-grpc@^0.1.5:
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.1.5.tgz#5c98290f73b2a3af38fe87db80ce151ee7ccff8e"
+bs-grpc@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.3.3.tgz#e8576d98388cd31eb6941011e0d11d8f9c793fed"
   dependencies:
     "@grpc/grpc-js" "^0.1.0"
     "@grpc/proto-loader" "^0.1.0"
@@ -176,6 +176,7 @@ bs-grpc@^0.1.5:
     protobufjs "^6.8.6"
     read-all-stream "^3.1.0"
     reason-future "^2.2.1"
+    toposort "^2.0.2"
 
 bs-platform@^3.1.5:
   version "3.1.5"
@@ -923,6 +924,10 @@ tar@^4:
     mkdirp "^0.5.0"
     safe-buffer "^5.1.2"
     yallist "^3.0.2"
+
+toposort@^2.0.2:
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/toposort/-/toposort-2.0.2.tgz#ae21768175d1559d48bef35420b2f4962f09c330"
 
 tough-cookie@~2.3.0:
   version "2.3.4"
