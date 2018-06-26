@@ -37,7 +37,20 @@ let addMessageToChannel = (nick, text, time, channel) =>
   channel.recentTextMessages :=
     Belt.Array.concat(channel.recentTextMessages^, [|{nick, text, time}|]);
 
-/* ChatService.sendMessage RPC */
+let sendMessageImpl = (channelName, text, callback) => {
+  getOrCreateChannel(channelName)
+  |> addMessageToChannel("anonymous", text, now());
+
+  /* Send successful reply */
+  Grpc.Chat.SendMessageReply.t() |> Grpc.reply(callback);
+};
+
+let channelsThatNeedPasswords = "#announcements";
+
+/* Error handler for ChatService.SendMessage RPC */
+let sendMessageErrorHandler = error =>
+  Grpc.Chat.SendMessageReply.make(~error, ());
+/* Implementation for ChatService.sendMessage RPC */
 let sendMessage = (_call, request, callback) => {
   let channelName =
     request |. Grpc.Chat.SendMessageRequest.channel |. Belt.Option.getExn;
@@ -46,14 +59,46 @@ let sendMessage = (_call, request, callback) => {
 
   Js.log3("ChatServerValidated.re got SendMessageRequest", channelName, text);
 
-  getOrCreateChannel(channelName)
-  |> addMessageToChannel("anonymous", text, now());
-
-  /* Send successful reply */
-  Grpc.Chat.SendMessageReply.t() |> Grpc.reply(callback);
+  /* Some channels require a password I guess */
+  if (channelName == channelsThatNeedPasswords) {
+    "that channel is password-protected" |> sendMessageErrorHandler |> Grpc.reply(callback)
+  } else {
+    sendMessageImpl(channelName, text, callback)
+  }
 };
-/* Error handler */
-let sendMessageErrorHandler = error => Grpc.Chat.SendMessageReply.make(~error, ());
+/* Error handler for ChatService.SendPasswordedMessage RPC */
+let sendPasswordedMessageErrorHandler = error =>
+  Grpc.Chat.SendMessageReply.make(~error, ());
+/* Implementation for ChatService.sendPasswordedMessage RPC */
+let sendPasswordedMessage = (_call, request, callback) => {
+  let sendMessageRequest =
+    request
+    |. Grpc.Chat.SendPasswordedMessageRequest.sendMessageRequest
+    |. Belt.Option.getExn;
+  let channelName =
+    sendMessageRequest
+    |. Grpc.Chat.SendMessageRequest.channel
+    |. Belt.Option.getExn;
+  let text =
+    sendMessageRequest
+    |. Grpc.Chat.SendMessageRequest.text
+    |. Belt.Option.getExn;
+  let password =
+    request |. Grpc.Chat.SendPasswordedMessageRequest.password |. Belt.Option.getExn;
+
+  Js.log3(
+    "ChatServerValidated.re got SendPasswordedMessageRequest",
+    channelName,
+    text,
+  );
+
+  /* Check the password */
+  if (password == "correct-password") {
+    sendMessageImpl(channelName, text, callback)
+  } else {
+    "password incorrect" |> sendPasswordedMessageErrorHandler |> Grpc.reply(callback)
+  }
+};
 
 /* ChatService.poll RPC */
 let poll = (_call, request, callback) => {
@@ -75,7 +120,7 @@ let poll = (_call, request, callback) => {
                    ~channel=channelName,
                    ~nick="anon",
                    ~text=textMessage.text,
-                   ()
+                   (),
                  )
                )
           )
@@ -88,17 +133,26 @@ let poll = (_call, request, callback) => {
     cm =>
       Grpc.Chat.PollReply.make(
         ~result=Grpc.Chat.PollReply.Channel_messages(cm),
-        ()
+        (),
       )
   )
   |> Grpc.reply(callback);
   ();
 };
 /* Error handler */
-let pollErrorHandler = error => Grpc.Chat.PollReply.make(~result=Grpc.Chat.PollReply.Error(error), ());
+let pollErrorHandler = error =>
+  Grpc.Chat.PollReply.make(~result=Grpc.Chat.PollReply.Error(error), ());
 
 let credentials = Grpc.Server.Credentials.Insecure.make();
 
-let chatService = Grpc.Chat.ChatService.make(~sendMessage, ~sendMessageErrorHandler, ~poll, ~pollErrorHandler);
+let chatService =
+  Grpc.Chat.ChatService.make(
+    ~sendMessage,
+    ~sendMessageErrorHandler,
+    ~sendPasswordedMessage,
+    ~sendPasswordedMessageErrorHandler,
+    ~poll,
+    ~pollErrorHandler,
+  );
 
 let server = Grpc.Server.make("127.0.0.1:12345", ~credentials, ~chatService);

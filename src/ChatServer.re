@@ -37,6 +37,14 @@ let addMessageToChannel = (nick, text, time, channel) =>
   channel.recentTextMessages :=
     Belt.Array.concat(channel.recentTextMessages^, [|{nick, text, time}|]);
 
+let sendMessageImpl = (channelName, text, callback) => {
+  getOrCreateChannel(channelName)
+  |> addMessageToChannel("anonymous", text, now());
+
+  /* Send successful reply */
+  Grpc.Chat.SendMessageReply.t() |> Grpc.reply(callback);
+};
+
 /* ChatService.sendMessage RPC */
 let sendMessage = (call, callback) => {
   let request = call |. Grpc.Chat.ChatService.SendMessageRpc.request;
@@ -45,13 +53,33 @@ let sendMessage = (call, callback) => {
   let text =
     request |. Grpc.Chat.SendMessageRequest.text |. Belt.Option.getExn;
 
-  Js.log3("got SendMessageRequest", channelName, text);
+  Js.log3("ChatServerValidated.re got SendMessageRequest", channelName, text);
 
-  getOrCreateChannel(channelName)
-  |> addMessageToChannel("anonymous", text, now());
+  sendMessageImpl(channelName, text, callback);
+};
+/* ChatService.sendPasswordedMessage RPC */
+let sendPasswordedMessage = (call, callback) => {
+  let request = call |. Grpc.Chat.ChatService.SendPasswordedMessageRpc.request;
+  let sendMessageRequest =
+    request
+    |. Grpc.Chat.SendPasswordedMessageRequest.sendMessageRequest
+    |. Belt.Option.getExn;
+  let channelName =
+    sendMessageRequest
+    |. Grpc.Chat.SendMessageRequest.channel
+    |. Belt.Option.getExn;
+  let text =
+    sendMessageRequest
+    |. Grpc.Chat.SendMessageRequest.text
+    |. Belt.Option.getExn;
 
-  /* Send successful reply */
-  Grpc.Chat.SendMessageReply.t() |> Grpc.reply(callback);
+  Js.log3(
+    "ChatServerValidated.re got SendPasswordedMessageRequest",
+    channelName,
+    text,
+  );
+
+  sendMessageImpl(channelName, text, callback);
 };
 
 /* ChatService.poll RPC */
@@ -97,6 +125,7 @@ let poll = (call, callback) => {
 
 let credentials = Grpc.Server.Credentials.Insecure.make();
 
-let chatService = Grpc.Chat.ChatService.t(~sendMessage, ~poll);
+let chatService =
+  Grpc.Chat.ChatService.t(~sendMessage, ~sendPasswordedMessage, ~poll);
 
 let server = Grpc.Server.make("127.0.0.1:12345", ~credentials, ~chatService);

@@ -33,6 +33,11 @@ message SendMessageRequest {
   option (tin_message_validation) = "x|.channel|.Belt.Option.getExn != \"#nope\" ? okSome(x) : transFieldError(\"can't send to channel #nope\")";
 }
 
+message SendPasswordedMessageRequest {
+  string password = 1;
+  SendMessageRequest sendMessageRequest = 2;
+}
+
 message SendMessageReply {
   string error = 1;
 }
@@ -75,5 +80,6 @@ message PasswordResetRequest {
 
 service ChatService {
   rpc SendMessage (SendMessageRequest) returns (SendMessageReply) {}
+  rpc SendPasswordedMessage (SendPasswordedMessageRequest) returns (SendMessageReply) {}
   rpc Poll (PollRequest) returns (PollReply) {}
 }

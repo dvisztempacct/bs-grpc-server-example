@@ -9,7 +9,8 @@ process.stdin.on('data', chunk => {
     channel: '#random',
     text: chunk.toString('utf8').trim()
   }
-  switch (text) {
+  const words = text.split(/\s+/g)
+  switch (words[0]) {
     case '/nochan':
       delete msg.channel
       break
@@ -22,22 +23,38 @@ process.stdin.on('data', chunk => {
       break
     case '/passfail':
       return void passFail()
+    case '/announce':
+      return void announce(words[1], words.slice(2).join(' '))
+    case '/announcebroken':
+      return void announce(void 0, void 0)
     case '/nopechan':
       msg.channel = '#nope'
       break
   }
   chatServiceClient.sendMessage(msg, (err, res) => {
-    console.log("sendMessage sez", err, res)
     if (err) console.error('err', err)
   })
 })
 function passFail() {
   chatServiceClient.passwordReset
 }
+function announce(password, text) {
+  chatServiceClient.sendPasswordedMessage({
+    password,
+    sendMessageRequest: {
+      channel: '#announcements',
+      text
+    }
+  }, (err, res) => {
+    if (err) console.error('grpc error:', err)
+    else if (res.error) console.error('app error:', res.error)
+    else console.log('announcement acknowledged')
+  })
+}
 let lastPollTime = now()
 const interval = setInterval(() => {
   const pollRequest = {
-    channels: ['#random'],
+    channels: ['#random', '#announcements'],
     time: lastPollTime
   }
   chatServiceClient.poll(pollRequest, (err, res) => {
