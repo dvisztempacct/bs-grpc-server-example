@@ -33,6 +33,7 @@ process.stdin.on('data', chunk => {
   }
   chatServiceClient.sendMessage(msg, (err, res) => {
     if (err) console.error('err', err)
+    else if (res.error) console.error('app error:', res.error)
   })
 })
 function passFail() {
