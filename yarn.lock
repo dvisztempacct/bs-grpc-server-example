@@ -166,9 +166,9 @@ brace-expansion@^1.1.7:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
-bs-grpc@^0.3.3:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.3.3.tgz#e8576d98388cd31eb6941011e0d11d8f9c793fed"
+bs-grpc@^0.4.0:
+  version "0.4.0"
+  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.4.0.tgz#fed6a30a831758062c6d8a869f519eae1db4e64e"
   dependencies:
     "@grpc/grpc-js" "^0.1.0"
     "@grpc/proto-loader" "^0.1.0"
@@ -954,8 +954,8 @@ util-deprecate@~1.0.1:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
 
 uuid@^3.0.0:
-  version "3.2.1"
-  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.2.1.tgz#12c528bb9d58d0b9265d9a2f6f0fe8be17ff1f14"
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.3.0.tgz#b237147804881d7b86f40a7ff8f590f15c37de32"
 
 verror@1.10.0:
   version "1.10.0"
