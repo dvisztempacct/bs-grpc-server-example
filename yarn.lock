@@ -166,9 +166,9 @@ brace-expansion@^1.1.7:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
-bs-grpc@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.4.0.tgz#fed6a30a831758062c6d8a869f519eae1db4e64e"
+bs-grpc@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.4.2.tgz#920bd6cf03de6f8e772efda2e8e2c8b5e919920f"
   dependencies:
     "@grpc/grpc-js" "^0.1.0"
     "@grpc/proto-loader" "^0.1.0"

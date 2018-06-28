@@ -30,6 +30,13 @@ process.stdin.on('data', chunk => {
     case '/nopechan':
       msg.channel = '#nope'
       break
+    case '/pollfail':
+      /* channel name is too short */
+      return void chatServiceClient.poll({ channels: ['#random', '#announcements', '#x'] }, (err, res) => {
+        if (err) console.error('err', err)
+        else if (res.error) console.error('app error:', res.error)
+        else console.error('poll should have failed but did not')
+      })
   }
   chatServiceClient.sendMessage(msg, (err, res) => {
     if (err) console.error('err', err)

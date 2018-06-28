@@ -44,7 +44,7 @@ message SendMessageReply {
 
 message PollRequest {
   repeated string channels = 1 [
-    (tin_field_validation) = "minItemCount(1) |> maxItemCount(16) /*|> items(x => x |> minStrLen(3) |> maxStrLen(16))*/"
+    (tin_field_validation) = "minItemCount(1) |> maxItemCount(16) |> repeated(x => x |> minStrLen(3) |> maxStrLen(16))"
   ];
   fixed32 time = 2 [
     (tin_field_validation) = "required |> positive"
