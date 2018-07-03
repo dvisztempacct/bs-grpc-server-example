@@ -56,8 +56,9 @@ let sendMessage = (_call, request, callback) => {
     request |. Grpc.Chat.SendMessageRequest.channel |. Belt.Option.getExn;
   let text =
     request |. Grpc.Chat.SendMessageRequest.text |. Belt.Option.getExn;
+  let urgency = request |. Grpc.Chat.SendMessageRequest.urgency;
 
-  Js.log3("ChatServerValidated.re got SendMessageRequest", channelName, text);
+  Js.log4("ChatServerValidated.re got SendMessageRequest", channelName, text, urgency);
 
   /* Some channels require a password I guess */
   if (channelName == channelsThatNeedPasswords) {
@@ -143,6 +144,14 @@ let poll = (_call, request, callback) => {
 let pollErrorHandler = error =>
   Grpc.Chat.PollReply.make(~result=Grpc.Chat.PollReply.Error(error), ());
 
+/* 64-bit integers as strings test */
+let echo64 = (_call, request, callback) => {
+	Js.log2("got 64 bit values:", request);
+	request |> Grpc.reply(callback);
+};
+
+let echo64ErrorHandler = x => failwith("unexpected error: " ++ x);
+
 let credentials = Grpc.Server.Credentials.Insecure.make();
 
 let chatService =
@@ -153,6 +162,8 @@ let chatService =
     ~sendPasswordedMessageErrorHandler,
     ~poll,
     ~pollErrorHandler,
+		~echo64,
+		~echo64ErrorHandler,
   );
 
 let server = Grpc.Server.make("127.0.0.1:12345", ~credentials, ~chatService);

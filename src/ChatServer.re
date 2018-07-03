@@ -123,9 +123,16 @@ let poll = (call, callback) => {
   ();
 };
 
+/* 64-bit integers as strings test */
+let echo64 = (call, callback) => {
+	let request = call |. Grpc.Chat.ChatService.Echo64Rpc.request;
+	Js.log2("got 64 bit values:", request);
+	request |> Grpc.reply(callback);
+};
+
 let credentials = Grpc.Server.Credentials.Insecure.make();
 
 let chatService =
-  Grpc.Chat.ChatService.t(~sendMessage, ~sendPasswordedMessage, ~poll);
+  Grpc.Chat.ChatService.t(~sendMessage, ~sendPasswordedMessage, ~poll, ~echo64);
 
 let server = Grpc.Server.make("127.0.0.1:12345", ~credentials, ~chatService);

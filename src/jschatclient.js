@@ -1,3 +1,4 @@
+const Long = require('long')
 const grpc = require('grpc')
 const chat = grpc.load('chat.proto').chat
 const chatServiceClient = new chat.ChatService('127.0.0.1:12345', grpc.credentials.createInsecure())
@@ -30,6 +31,11 @@ process.stdin.on('data', chunk => {
     case '/nopechan':
       msg.channel = '#nope'
       break
+    case '/urgentmsg':
+      msg.urgency = 1
+      break
+    case '/64':
+      return void a64bitTest()
     case '/pollfail':
       /* channel name is too short */
       return void chatServiceClient.poll({ channels: ['#random', '#announcements', '#x'] }, (err, res) => {
@@ -57,6 +63,19 @@ function announce(password, text) {
     if (err) console.error('grpc error:', err)
     else if (res.error) console.error('app error:', res.error)
     else console.log('announcement acknowledged')
+  })
+}
+function a64bitTest() {
+	const msg = {
+		fix64: '9223372036854775807',
+		sfix64: '-9223372036854775807',
+		varint64: '-9223372036854775807',
+		svarint64: '-9223372036854775807',
+		uvarint64: '9223372036854775807',
+	}
+  chatServiceClient.echo64(msg, (err, res) => {
+    if (err) console.error('64 bit error:', err)
+    else console.log('64 bit reply:', res)
   })
 }
 let lastPollTime = now()

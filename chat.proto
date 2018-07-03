@@ -13,6 +13,12 @@ extend google.protobuf.FieldOptions {
   string tin_field_validation = 4000;
 }
 
+enum Urgency {
+  URGENCY_NORMAL = 0;
+  URGENCY_URGENT = 1;
+  URGENCY_RELAXED = 2;
+};
+
 message IdentRequest {
   string nick = 1 [
     (tin_field_validation) = "required |> trimString |> nonEmptyString |> maxStrLen(8)"
@@ -30,12 +36,22 @@ message SendMessageRequest {
   string text = 2 [
     (tin_field_validation) = "required |> trimString |> nonEmptyString |> maxStrLen(70)"
   ];
+  Urgency urgency = 3 [
+    (tin_field_validation) = "required"
+  ];
   option (tin_message_validation) = "x|.channel|.Belt.Option.getExn != \"#nope\" ? okSome(x) : transFieldError(\"can't send to channel #nope\")";
 }
 
 message SendPasswordedMessageRequest {
-  string password = 1;
-  SendMessageRequest sendMessageRequest = 2;
+  string password = 1 [
+    (tin_field_validation) = "required"
+  ];
+  SendMessageRequest sendMessageRequest = 2 [
+    (tin_field_validation) = "required"
+  ];
+  Urgency urgency = 3 [
+    (tin_field_validation) = "required"
+  ];
 }
 
 message SendMessageReply {
@@ -55,6 +71,7 @@ message ChannelMessage {
   string channel = 1;
   string nick = 2;
   string text = 3;
+  Urgency urgency = 4;
 };
 
 message ChannelMessages {
@@ -67,6 +84,14 @@ message PollReply {
     string error = 2;
   }
 }
+
+message Some64BitValues {
+	fixed64 fix64 = 1;
+	sfixed64 sfix64 = 2;
+	int64 varint64 = 3;
+	sint64 svarint64 = 4;
+	uint64 uvarint64 = 5;
+};
 
 message PasswordResetRequest {
   string password = 1 [
@@ -82,4 +107,5 @@ service ChatService {
   rpc SendMessage (SendMessageRequest) returns (SendMessageReply) {}
   rpc SendPasswordedMessage (SendPasswordedMessageRequest) returns (SendMessageReply) {}
   rpc Poll (PollRequest) returns (PollReply) {}
+	rpc Echo64 (Some64BitValues) returns (Some64BitValues) {}
 }
