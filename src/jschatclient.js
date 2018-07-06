@@ -1,7 +1,21 @@
 const Long = require('long')
 const grpc = require('grpc')
 const chat = grpc.load('chat.proto').chat
-const chatServiceClient = new chat.ChatService('127.0.0.1:12345', grpc.credentials.createInsecure())
+const fs = require('fs')
+const loadCert = x => fs.readFileSync(__dirname + '/../certs/'+ x)
+const channelCredentials = grpc.credentials.createSsl(
+  loadCert('root.crt'),
+  loadCert('client-private-key.pem'),
+  loadCert('client-public-certificate.crt'),
+)
+const metadataGenerator = (ignored, callback) => {
+  const metadata = new grpc.Metadata
+  metadata.set('nick', 'eich')
+  callback(null, metadata)
+}
+const callCredentials = grpc.credentials.createFromMetadataGenerator(metadataGenerator)
+const combinedCredentials = grpc.credentials.combineChannelCredentials(channelCredentials, callCredentials)
+const chatServiceClient = new chat.ChatService('127.0.0.1:12345', combinedCredentials)
 const now = () => Math.floor(Date.now() / 1000)
 
 process.stdin.on('data', chunk => {

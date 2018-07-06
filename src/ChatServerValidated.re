@@ -59,11 +59,13 @@ let sendMessage = (call, request, callback) => {
   let metaData = call |. Grpc.Chat.ChatService.SendMessageRpc.getMeta;
   let nick = metaData |. Js.Dict.get("nick");
   Js.log2("got metadata nick=", nick);
-  let channelName =
-    request |. Grpc.Chat.SendMessageRequest.channel |. Belt.Option.getExn;
-  let text =
-    request |. Grpc.Chat.SendMessageRequest.text |. Belt.Option.getExn;
-  let urgency = request |. Grpc.Chat.SendMessageRequest.urgency;
+  let (channelName, text, urgency) = Grpc.Chat.SendMessageRequest.(
+    Belt.Option.(
+      request |. channel |. getExn,
+      request |. text |. getExn,
+      request |. urgency |. getExn
+    )
+  );
 
   Js.log4(
     "ChatServerValidated.re got SendMessageRequest",
@@ -182,15 +184,9 @@ let echo64ErrorHandler = x => failwith("unexpected error: " ++ x);
 
 let credentials =
   Grpc.Server.Credentials.Ssl.make(
-    Grpc.loadCert(certPath ++ "/root.crt"),
-    [|
-      Grpc.ServerKeyAndCert.t(
-        ~privateKey=Grpc.loadCert(certPath ++ "/server-private-key.pem"),
-        ~certChain=
-          Grpc.loadCert(certPath ++ "/server-public-certificate.crt"),
-      ),
-    |],
-    false,
+    ~rootCert=Grpc.loadCert(certPath ++ "/root.crt"),
+    ~privateKey=Grpc.loadCert(certPath ++ "/server-private-key.pem"),
+    ~certChain=Grpc.loadCert(certPath ++ "/server-public-certificate.crt"),
   );
 
 let chatService =
