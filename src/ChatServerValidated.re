@@ -1,5 +1,4 @@
-[@bs.val]
-external dirname : string = "__dirname";
+[@bs.val] external dirname : string = "__dirname";
 
 let certPath = dirname ++ "/../certs/";
 
@@ -66,21 +65,29 @@ let sendMessage = (call, request, callback) => {
     request |. Grpc.Chat.SendMessageRequest.text |. Belt.Option.getExn;
   let urgency = request |. Grpc.Chat.SendMessageRequest.urgency;
 
-  Js.log4("ChatServerValidated.re got SendMessageRequest", channelName, text, urgency);
+  Js.log4(
+    "ChatServerValidated.re got SendMessageRequest",
+    channelName,
+    text,
+    urgency,
+  );
 
   /* Some channels require a password I guess */
   if (channelName == channelsThatNeedPasswords) {
-    "that channel is password-protected" |> sendMessageErrorHandler |> Grpc.reply(callback)
+    "that channel is password-protected"
+    |> sendMessageErrorHandler
+    |> Grpc.reply(callback);
   } else {
-    sendMessageImpl(channelName, text, callback)
-  }
+    sendMessageImpl(channelName, text, callback);
+  };
 };
 /* Error handler for ChatService.SendPasswordedMessage RPC */
 let sendPasswordedMessageErrorHandler = error =>
   Grpc.Chat.SendMessageReply.make(~error, ());
 /* Implementation for ChatService.sendPasswordedMessage RPC */
 let sendPasswordedMessage = (call, request, callback) => {
-  let metaData = call |. Grpc.Chat.ChatService.SendPasswordedMessageRpc.getMeta;
+  let metaData =
+    call |. Grpc.Chat.ChatService.SendPasswordedMessageRpc.getMeta;
   let nick = metaData |. Js.Dict.get("nick");
   Js.log2("got metadata nick=", nick);
   let sendMessageRequest =
@@ -96,7 +103,9 @@ let sendPasswordedMessage = (call, request, callback) => {
     |. Grpc.Chat.SendMessageRequest.text
     |. Belt.Option.getExn;
   let password =
-    request |. Grpc.Chat.SendPasswordedMessageRequest.password |. Belt.Option.getExn;
+    request
+    |. Grpc.Chat.SendPasswordedMessageRequest.password
+    |. Belt.Option.getExn;
 
   Js.log3(
     "ChatServerValidated.re got SendPasswordedMessageRequest",
@@ -106,10 +115,12 @@ let sendPasswordedMessage = (call, request, callback) => {
 
   /* Check the password */
   if (password == "correct-password") {
-    sendMessageImpl(channelName, text, callback)
+    sendMessageImpl(channelName, text, callback);
   } else {
-    "password incorrect" |> sendPasswordedMessageErrorHandler |> Grpc.reply(callback)
-  }
+    "password incorrect"
+    |> sendPasswordedMessageErrorHandler
+    |> Grpc.reply(callback);
+  };
 };
 
 /* ChatService.poll RPC */
@@ -163,22 +174,24 @@ let echo64 = (call, request, callback) => {
   let metaData = call |. Grpc.Chat.ChatService.Echo64Rpc.getMeta;
   let nick = metaData |. Js.Dict.get("nick");
   Js.log2("got metadata nick=", nick);
-	Js.log2("got 64 bit values:", request);
-	request |> Grpc.reply(callback);
+  Js.log2("got 64 bit values:", request);
+  request |> Grpc.reply(callback);
 };
 
 let echo64ErrorHandler = x => failwith("unexpected error: " ++ x);
 
-let credentials = Grpc.Server.Credentials.Ssl.make(
-  Grpc.loadCert(certPath ++ "/root.crt"),
-  [|
-  Grpc.ServerKeyAndCert.t(
-    ~privateKey=Grpc.loadCert(certPath ++ "/server-private-key.pem"),
-    ~certChain=Grpc.loadCert(certPath ++ "/server-public-certificate.crt"),
-  )
-  |],
-  false
-);
+let credentials =
+  Grpc.Server.Credentials.Ssl.make(
+    Grpc.loadCert(certPath ++ "/root.crt"),
+    [|
+      Grpc.ServerKeyAndCert.t(
+        ~privateKey=Grpc.loadCert(certPath ++ "/server-private-key.pem"),
+        ~certChain=
+          Grpc.loadCert(certPath ++ "/server-public-certificate.crt"),
+      ),
+    |],
+    false,
+  );
 
 let chatService =
   Grpc.Chat.ChatService.make(
@@ -188,8 +201,8 @@ let chatService =
     ~sendPasswordedMessageErrorHandler,
     ~poll,
     ~pollErrorHandler,
-		~echo64,
-		~echo64ErrorHandler,
+    ~echo64,
+    ~echo64ErrorHandler,
   );
 
 let server = Grpc.Server.make("127.0.0.1:12345", ~credentials, ~chatService);
