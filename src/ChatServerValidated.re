@@ -1,3 +1,8 @@
+[@bs.val]
+external dirname : string = "__dirname";
+
+let certPath = dirname ++ "/../certs/";
+
 let now = () => int_of_float(Js.Date.now() /. 1000.0);
 
 type textMessage = {
@@ -51,7 +56,10 @@ let channelsThatNeedPasswords = "#announcements";
 let sendMessageErrorHandler = error =>
   Grpc.Chat.SendMessageReply.make(~error, ());
 /* Implementation for ChatService.sendMessage RPC */
-let sendMessage = (_call, request, callback) => {
+let sendMessage = (call, request, callback) => {
+  let metaData = call |. Grpc.Chat.ChatService.SendMessageRpc.getMeta;
+  let nick = metaData |. Js.Dict.get("nick");
+  Js.log2("got metadata nick=", nick);
   let channelName =
     request |. Grpc.Chat.SendMessageRequest.channel |. Belt.Option.getExn;
   let text =
@@ -71,7 +79,10 @@ let sendMessage = (_call, request, callback) => {
 let sendPasswordedMessageErrorHandler = error =>
   Grpc.Chat.SendMessageReply.make(~error, ());
 /* Implementation for ChatService.sendPasswordedMessage RPC */
-let sendPasswordedMessage = (_call, request, callback) => {
+let sendPasswordedMessage = (call, request, callback) => {
+  let metaData = call |. Grpc.Chat.ChatService.SendPasswordedMessageRpc.getMeta;
+  let nick = metaData |. Js.Dict.get("nick");
+  Js.log2("got metadata nick=", nick);
   let sendMessageRequest =
     request
     |. Grpc.Chat.SendPasswordedMessageRequest.sendMessageRequest
@@ -102,7 +113,10 @@ let sendPasswordedMessage = (_call, request, callback) => {
 };
 
 /* ChatService.poll RPC */
-let poll = (_call, request, callback) => {
+let poll = (call, request, callback) => {
+  let metaData = call |. Grpc.Chat.ChatService.PollRpc.getMeta;
+  let nick = metaData |. Js.Dict.get("nick");
+  Js.log2("got metadata nick=", nick);
   let channelNames =
     request |. Grpc.Chat.PollRequest.channels |. Belt.Option.getExn;
   let time = request |. Grpc.Chat.PollRequest.time |. Belt.Option.getExn;
@@ -145,14 +159,26 @@ let pollErrorHandler = error =>
   Grpc.Chat.PollReply.make(~result=Grpc.Chat.PollReply.Error(error), ());
 
 /* 64-bit integers as strings test */
-let echo64 = (_call, request, callback) => {
+let echo64 = (call, request, callback) => {
+  let metaData = call |. Grpc.Chat.ChatService.Echo64Rpc.getMeta;
+  let nick = metaData |. Js.Dict.get("nick");
+  Js.log2("got metadata nick=", nick);
 	Js.log2("got 64 bit values:", request);
 	request |> Grpc.reply(callback);
 };
 
 let echo64ErrorHandler = x => failwith("unexpected error: " ++ x);
 
-let credentials = Grpc.Server.Credentials.Insecure.make();
+let credentials = Grpc.Server.Credentials.Ssl.make(
+  Grpc.loadCert(certPath ++ "/root.crt"),
+  [|
+  Grpc.ServerKeyAndCert.t(
+    ~privateKey=Grpc.loadCert(certPath ++ "/server-private-key.pem"),
+    ~certChain=Grpc.loadCert(certPath ++ "/server-public-certificate.crt"),
+  )
+  |],
+  false
+);
 
 let chatService =
   Grpc.Chat.ChatService.make(
