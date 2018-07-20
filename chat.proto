@@ -1,17 +1,6 @@
 syntax = "proto3";
 package chat;
-
-
-import "google/protobuf/descriptor.proto";
-extend google.protobuf.FileOptions {
-  string tin_module_validation = 4000;
-}
-extend google.protobuf.MessageOptions {
-  string tin_message_validation = 4000;
-}
-extend google.protobuf.FieldOptions {
-  string tin_field_validation = 4000;
-}
+import "tin.proto";
 
 enum Urgency {
   URGENCY_NORMAL = 0;
@@ -21,7 +10,7 @@ enum Urgency {
 
 message IdentRequest {
   string nick = 1 [
-    (tin_field_validation) = "required |> trimString |> nonEmptyString |> maxStrLen(8)"
+    (tin.field_validation) = "required |> trimString |> nonEmptyString |> maxStrLen(8)"
   ];
 }
 
@@ -31,26 +20,23 @@ message IdentReply {
 
 message SendMessageRequest {
   string channel = 1 [
-    (tin_field_validation) = "required |> trimString |> minStrLen(3) |> maxStrLen(16)"
+    (tin.field_validation) = "required |> trimString |> minStrLen(3) |> maxStrLen(16)"
   ];
   string text = 2 [
-    (tin_field_validation) = "required |> trimString |> nonEmptyString |> maxStrLen(70)"
+    (tin.field_validation) = "required |> trimString |> nonEmptyString |> maxStrLen(70)"
   ];
   Urgency urgency = 3 [
-    (tin_field_validation) = "required"
+    (tin.field_validation) = "required"
   ];
-  option (tin_message_validation) = "x|.channel|.Belt.Option.getExn != \"#nope\" ? okSome(x) : transFieldError(\"can't send to channel #nope\")";
+  option (tin.message_validation) = "x|.channel|.Belt.Option.getExn != \"#nope\" ? okSome(x) : transFieldError(\"can't send to channel #nope\")";
 }
 
 message SendPasswordedMessageRequest {
   string password = 1 [
-    (tin_field_validation) = "required"
+    (tin.field_validation) = "required"
   ];
   SendMessageRequest sendMessageRequest = 2 [
-    (tin_field_validation) = "required"
-  ];
-  Urgency urgency = 3 [
-    (tin_field_validation) = "required"
+    (tin.field_validation) = "required"
   ];
 }
 
@@ -60,10 +46,10 @@ message SendMessageReply {
 
 message PollRequest {
   repeated string channels = 1 [
-    (tin_field_validation) = "minItemCount(1) |> maxItemCount(16) |> repeated(x => x |> minStrLen(3) |> maxStrLen(16))"
+    (tin.field_validation) = "minItemCount(1) |> maxItemCount(16) |> repeated(x => x |> minStrLen(3) |> maxStrLen(16))"
   ];
   fixed32 time = 2 [
-    (tin_field_validation) = "required |> positive"
+    (tin.field_validation) = "required |> positive"
   ];
 }
 
@@ -95,12 +81,12 @@ message Some64BitValues {
 
 message PasswordResetRequest {
   string password = 1 [
-    (tin_field_validation) = "required |> minStrLen(10)"
+    (tin.field_validation) = "required |> minStrLen(10)"
   ];
   string passwordConfirm = 2 [
-    (tin_field_validation) = "required |> minStrLen(10)"
+    (tin.field_validation) = "required |> minStrLen(10)"
   ];
-  option (tin_message_validation) = "password(x) == passwordConfirm(x) ? okSome(x) : transFieldError(\"passwords don't match\")";
+  option (tin.message_validation) = "password(x) == passwordConfirm(x) ? okSome(x) : transFieldError(\"passwords don't match\")";
 }
 
 service ChatService {
