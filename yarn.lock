@@ -166,16 +166,18 @@ brace-expansion@^1.1.7:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
-bs-grpc@^0.4.4:
-  version "0.4.4"
-  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.4.4.tgz#3af3859d273a33d2396e6daeabb361bc59ee05e5"
+bs-grpc@^0.10.2:
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.10.2.tgz#1b8b5630bfd90cfd0205087ae60795f0bd09c42d"
   dependencies:
     "@grpc/grpc-js" "^0.1.0"
     "@grpc/proto-loader" "^0.1.0"
+    grpc-alt-proto-loader "^0.4.1"
     grpc-tools "^1.6.6"
     protobufjs "^6.8.6"
     read-all-stream "^3.1.0"
     reason-future "^2.2.1"
+    resolve "^1.8.1"
     toposort "^2.0.2"
 
 bs-platform@^3.1.5:
@@ -370,6 +372,15 @@ glob@^7.0.5:
 graceful-fs@^4.1.2:
   version "4.1.11"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.1.11.tgz#0e8bdfe4d1ddb8854d64e04ea7c00e2a026e5658"
+
+grpc-alt-proto-loader@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/grpc-alt-proto-loader/-/grpc-alt-proto-loader-0.4.1.tgz#7abbc04dde7e3ff0c1718d51725ab068e09854ed"
+  dependencies:
+    "@types/lodash" "^4.14.104"
+    "@types/node" "^9.4.6"
+    lodash "^4.17.5"
+    protobufjs "^6.8.6"
 
 grpc-tools@^1.6.6:
   version "1.6.6"
@@ -688,6 +699,10 @@ path-is-absolute@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/path-is-absolute/-/path-is-absolute-1.0.1.tgz#174b9268735534ffbc7ace6bf53a5a9e1b5c5f5f"
 
+path-parse@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/path-parse/-/path-parse-1.0.5.tgz#3c1adf871ea9cd6c9431b6ea2bd74a0ff055c4c1"
+
 performance-now@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/performance-now/-/performance-now-0.2.0.tgz#33ef30c5c77d4ea21c5a53869d91b56d8f2555e5"
@@ -799,6 +814,12 @@ request@2.81.0:
     tough-cookie "~2.3.0"
     tunnel-agent "^0.6.0"
     uuid "^3.0.0"
+
+resolve@^1.8.1:
+  version "1.8.1"
+  resolved "https://registry.yarnpkg.com/resolve/-/resolve-1.8.1.tgz#82f1ec19a423ac1fbd080b0bab06ba36e84a7a26"
+  dependencies:
+    path-parse "^1.0.5"
 
 rimraf@2, rimraf@^2.5.1, rimraf@^2.6.1:
   version "2.6.2"
