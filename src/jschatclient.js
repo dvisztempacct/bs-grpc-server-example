@@ -1,5 +1,5 @@
 const Long = require('long')
-const grpc = require('grpc')
+const grpc = require('bs-grpc')
 const chat = grpc.load('chat.proto').chat
 const fs = require('fs')
 const loadCert = x => fs.readFileSync(__dirname + '/../certs/'+ x)
@@ -22,7 +22,8 @@ process.stdin.on('data', chunk => {
   const text = chunk.toString('utf8').trim()
   const msg = {
     channel: '#random',
-    text: chunk.toString('utf8').trim()
+    text: chunk.toString('utf8').trim(),
+    urgency: 0
   }
   const words = text.split(/\s+/g)
   switch (words[0]) {
@@ -67,13 +68,16 @@ function passFail() {
   chatServiceClient.passwordReset
 }
 function announce(password, text) {
-  chatServiceClient.sendPasswordedMessage({
+  const msg = {
     password,
     sendMessageRequest: {
       channel: '#announcements',
-      text
+      text,
+      urgency: 0
     }
-  }, (err, res) => {
+  }
+  console.log('sending announcement message', msg, chat.SendPasswordedMessageRequest.verify(msg), chat.SendPasswordedMessageRequest.fromObject(msg))
+  chatServiceClient.sendPasswordedMessage(msg, (err, res) => {
     if (err) console.error('grpc error:', err)
     else if (res.error) console.error('app error:', res.error)
     else console.log('announcement acknowledged')
