@@ -23,7 +23,7 @@ process.stdin.on('data', chunk => {
   const msg = {
     channel: '#random',
     text: chunk.toString('utf8').trim(),
-    urgency: 0
+    urgency: 2
   }
   const words = text.split(/\s+/g)
   switch (words[0]) {

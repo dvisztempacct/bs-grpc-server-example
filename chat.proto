@@ -28,7 +28,7 @@ message SendMessageRequest {
   Urgency urgency = 3 [
     (tin.field_validation) = "required"
   ];
-  option (tin.message_validation) = "x|.channel|.Belt.Option.getExn != \"#nope\" ? okSome(x) : transFieldError(\"can't send to channel #nope\")";
+  option (tin.message_validation) = "x|.channelGet|.Belt.Option.getExn != \"#nope\" ? okSome(x) : transFieldError(\"can't send to channel #nope\")";
 }
 
 message SendPasswordedMessageRequest {
@@ -57,7 +57,9 @@ message ChannelMessage {
   string channel = 1;
   string nick = 2;
   string text = 3;
-  Urgency urgency = 4;
+  Urgency urgency = 4 [
+    (tin.field_validation) = "required"
+  ];
 };
 
 message ChannelMessages {
@@ -86,7 +88,7 @@ message PasswordResetRequest {
   string passwordConfirm = 2 [
     (tin.field_validation) = "required |> minStrLen(10)"
   ];
-  option (tin.message_validation) = "password(x) == passwordConfirm(x) ? okSome(x) : transFieldError(\"passwords don't match\")";
+  option (tin.message_validation) = "passwordGet(x) == passwordConfirmGet(x) ? okSome(x) : transFieldError(\"passwords don't match\")";
 }
 
 service ChatService {

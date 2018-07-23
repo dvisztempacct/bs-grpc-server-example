@@ -59,11 +59,13 @@ let sendMessage = (call, request, callback) => {
   let metaData = call |. Grpc.Chat.ChatService.SendMessageRpc.getMeta;
   let nick = metaData |. Js.Dict.get("nick");
   Js.log2("got metadata nick=", nick);
+  Js.log2("sendMessageRequest=", request);
+  Js.log2("sendMessageRequest |. urgency=", request |. Grpc.Chat.SendMessageRequest.urgencyGet);
   let (channelName, text, urgency) = Grpc.Chat.SendMessageRequest.(
     Belt.Option.(
-      request |. channel |. getExn,
-      request |. text |. getExn,
-      request |. urgency |. getExn
+      request |. channelGet |. getExn,
+      request |. textGet |. getExn,
+      request |. urgencyGet |. getExn
     )
   );
 
@@ -94,19 +96,19 @@ let sendPasswordedMessage = (call, request, callback) => {
   Js.log2("got metadata nick=", nick);
   let sendMessageRequest =
     request
-    |. Grpc.Chat.SendPasswordedMessageRequest.sendMessageRequest
+    |. Grpc.Chat.SendPasswordedMessageRequest.sendMessageRequestGet
     |. Belt.Option.getExn;
   let channelName =
     sendMessageRequest
-    |. Grpc.Chat.SendMessageRequest.channel
+    |. Grpc.Chat.SendMessageRequest.channelGet
     |. Belt.Option.getExn;
   let text =
     sendMessageRequest
-    |. Grpc.Chat.SendMessageRequest.text
+    |. Grpc.Chat.SendMessageRequest.textGet
     |. Belt.Option.getExn;
   let password =
     request
-    |. Grpc.Chat.SendPasswordedMessageRequest.password
+    |. Grpc.Chat.SendPasswordedMessageRequest.passwordGet
     |. Belt.Option.getExn;
 
   Js.log3(
@@ -131,8 +133,8 @@ let poll = (call, request, callback) => {
   let nick = metaData |. Js.Dict.get("nick");
   Js.log2("got metadata nick=", nick);
   let channelNames =
-    request |. Grpc.Chat.PollRequest.channels |. Belt.Option.getExn;
-  let time = request |. Grpc.Chat.PollRequest.time |. Belt.Option.getExn;
+    request |. Grpc.Chat.PollRequest.channelsGet |. Belt.Option.getExn;
+  let time = request |. Grpc.Chat.PollRequest.timeGet |. Belt.Option.getExn;
 
   Js.log3("ChatServerValidated.re got PollRequest", channelNames, time);
 

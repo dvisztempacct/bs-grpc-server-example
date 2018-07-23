@@ -166,12 +166,13 @@ brace-expansion@^1.1.7:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
 
-bs-grpc@^0.10.2:
-  version "0.10.2"
-  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.10.2.tgz#1b8b5630bfd90cfd0205087ae60795f0bd09c42d"
+bs-grpc@0.11.0-rc.0:
+  version "0.11.0-rc.0"
+  resolved "https://registry.yarnpkg.com/bs-grpc/-/bs-grpc-0.11.0-rc.0.tgz#b8e11f4ceba19b52b16fc4e1a5b40a790e6d7c7a"
   dependencies:
     "@grpc/grpc-js" "^0.1.0"
     "@grpc/proto-loader" "^0.1.0"
+    bs-platform "^4.0.1"
     grpc-alt-proto-loader "^0.4.1"
     grpc-tools "^1.6.6"
     protobufjs "^6.8.6"
@@ -180,9 +181,9 @@ bs-grpc@^0.10.2:
     resolve "^1.8.1"
     toposort "^2.0.2"
 
-bs-platform@^3.1.5:
-  version "3.1.5"
-  resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-3.1.5.tgz#fb34ee4702bc9163848d5537096c4f31ebaeed40"
+bs-platform@4.0.1, bs-platform@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-4.0.1.tgz#544b58c2a53299cf406b57477e06389e4adab421"
 
 bs-result@^2.2.0:
   version "2.2.0"
